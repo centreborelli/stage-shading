@@ -1,0 +1,40 @@
+Bonjour,
+
+Petit rappel des taches proposées pour la première semaine:
+
+0. Écrire la méthode des caractéristiques générale en dimension 2 pour
+une EDP de la forme
+
+        F(x, y, u(x,y), u_x(x,y), u_y(x,y)) = 0
+
+sur un domaine Ω du plan euclidien.  Référence: le livre de Evans,
+pages 91-92 (pour la notation), 97-98 (pour la méthode), puis les
+pages suivantes pour des exemples et les conditions initiales.  Le
+"Evans" est la bible des PDE.  Vous pouvez télécharger le Evans entier
+ici:
+
+        boucantrin.ovh.hw.ipol.im:7788/static/evanspde.pdf
+
+et vous trouverez le chapitre concerné en pièce jointe.
+
+1. Calculer les courbes caractéristiques de l'équation Eikonale sur un rectangle
+
+2. Calculer les courbes caractéristiques de l'équation de shape from
+shading sur un rectangle, avec une direction du soleil (α,β,γ)
+
+3. Implementer le modèle direct de shape from shading en Python.
+Étant donné (1) une fonction d'hauteur h(x,y), (2) une direction du
+soleil  n=(α,β,γ), (3) les paramètres A,B d'albedo et lumière
+ambiante, trouver l'image I(x,y) observée.  Comme exemple, veuillez
+trouver en pièce jointe une carte topographique du volcan Fuji (dans
+le fichier fujy.npy, que vous pouvez lire depuis le Python).  Vous
+devriez être capables de construire une image qui ressemble à
+"fuji.png".  Bonus: faire un vidéo avec l'évolution de l'éclairage
+lelong du jour quand n=n(t) suit une trajectoire réaliste de la
+diréction du soleil.
+
+4. Commencer à lire la bibliographie.  En un message séparé je vous
+envoie les références en pdf.
+
+bien cordialement,
+enric

@@ -1,0 +1,14 @@
+Matériel pour le stage L3 de Romain Dugast et Vianney De La Salle
+
+Titre: Fast Marching Hamiltonien avec Conditions aux Limites Mixtes
+
+Encadrants: Marie de Masson d'Autume, Enric Meinhardt-Llopis
+
+Fichiers:
+
+	bib/           articles associés
+	doc/           documentation (rapport de stage, slides, etc.)
+        src/           code
+	data/heights   données (hauteurs)
+	data/images    données (images)
+	mails/         historique de communication

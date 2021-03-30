@@ -1,0 +1,4 @@
+sujet.tex     feuille de description avec références
+pres.tex      présentation du sujet de stage (slides)
+
+Compiler par exemple avec "latexmk sujet".
