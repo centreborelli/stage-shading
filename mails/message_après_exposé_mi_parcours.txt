@@ -1,0 +1,50 @@
+Bonjour,
+
+
+Félicitations pour l'exposé de jeudi, il était très clair et intéressant! (ce
+n'est pas seulement moi qui le dis).
+
+Deux commentaires sur l'exposé:
+
+1. Il faut faire de sorte qu'il soit clair que vous avez terminé.  Si vous
+simplement arrêtez de parler après la dernière phrase, tout le monde pense que
+c'est une pause.  Dites "merci beaucoup pour votre attention" par exemple.
+
+2. Vous avez adapté la preuve d'unicité de l'Eikonale à votre cas.  L'existence
+devrait suivre rapidement quand la donnée I(x,y) provient de l'éclairage d'un
+relief u(x,y).  Mais que se passe-t-il pour un I(x,y) quelconque?  Il se peut
+bien qu'il n'y ait pas d'existence.  Alors, l'algorithme calcule quoi?
+
+3. La question du prof. Facciolo était pertinente.  Vos solutions "non uniques"
+présentent des crêtes, et d'un côté de la crête il parait que la solution
+correcte est trouvée.  Si ces crêtes sont bien l'endroit où le fast-marching
+s'arrête, il veut dire que le critère de tri pour l'algorithme de
+Dijkstra ne correspond pas à ce qu'il devrait.  Il aurait fallu continuer la
+solution au delà de cette crête, au lieu de l'avoir arrêtée!  Il vaudra le coup
+d'essayer plusieurs critères de tri pour l'évolution du fast-marching.
+
+
+Sur votre travail futur:
+
+1. Commencez déjà à rédiger le rapport final.  La structure devrait être
+claire, et vous avez déjà quelques bouts de texte à y mettre.  Laissez les
+sections à écrire vides, mais avec un titre.  Mettez toutes les figures et
+expériences dans le rapport.
+
+2. Pour la partie théorique, rédigez d'abord la démonstration de l'unicité
+des solutions de viscosité, avec toutes les définitions nécessaires.
+
+3. Pensez à utiliser un langage visuel uniforme pour toutes les expériences:
+3.1. Les images éclairées I(x,y) toujours à niveau de gris
+3.2. Le soleil toujours haut à gauche (par exemple)
+3.3. Les images de hauteurs u(x,y) toujours avec la même palette (géographique?)
+3.4. Les images d'erreur u-u* avec une palette signée (rouge-blanc-bleu)
+3.5. La partie extérieure du domaine Ω avec une couleur hors-palette
+
+4. Veuillez partager *tous* vos codes sur le git afin que l'on puisse
+reproduire vos expériences.  Conseil: dans le fichier LaTeX, au côté de
+chaque image/expérience, rajouter un commentaire en expliquant exactement
+quel morceau de code utilisé pour reproduire cette expérience.
+
+5. Bonus (très stylé!): les figures sont générées automatiquement à partir
+des commentaires extraits du texte LaTeX.
