@@ -1,6 +1,5 @@
 import numpy as np
 import pylab as plt
-import os
 
 
 plt.ion()
@@ -115,10 +114,8 @@ def Initialise_contour(height,seuil) :
 
 # TODO : penser à prendre h identique à celui de l'image enregistré
 h=1 # c'est toujours h=1 pour les reliefs obtenus par résolution de l'équation eikonale
-path = 'D:/L3/Stage/Fast marching SFS/RELIEFS'
-os.chdir(path)
 
-height = np.load("cône.npy")
+height = np.load("../data/heights/cône.npy")
 (n,m) = height.shape
 
 """On impose zéro aux bords du rectangle, et on résoud SFS avec le fast marching en partant du bord"""

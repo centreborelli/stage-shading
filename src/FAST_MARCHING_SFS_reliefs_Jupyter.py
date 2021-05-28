@@ -1,6 +1,5 @@
 import numpy as np
 import pylab as plt
-import os
 
 
 plt.ion()
