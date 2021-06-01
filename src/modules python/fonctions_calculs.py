@@ -2,7 +2,7 @@ import numpy as np
 import os
 path = 'D:/L3/Stage/modules python'
 os.chdir(path)
-import fonctions_maillage as fm
+import fonctions_FMM as fm
 
 def solve_quad(x, y, cp,epsx,epsy,params) :
     '''Renvoie la racine la plus grande de l'équation du second degré à résoudre, dépendant du nombre de voisin disponibles, en indiquant comment elle a été calculée'''
