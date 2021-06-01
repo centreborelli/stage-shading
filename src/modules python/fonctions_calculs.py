@@ -73,3 +73,6 @@ def variation_per(U,r,i,j,pi,pj) :
                 return(0)
             else :
                 return(abs(U[voisins_h[0],voisins_h[1]]-2*U[i,j]+U[voisins_b[0],voisins_b[1]]))
+
+def variation_non(U,r,i,j,pi,pj) :
+    return(0)

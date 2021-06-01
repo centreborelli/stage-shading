@@ -126,7 +126,7 @@ def Initialise_contour(height,seuil) :
     V[B] = 0
     return(U,V,Etats)
 
-def FFM(Etats,V,U,I,Bord,params,solve_quad,variation,cas = False, iterations = False,plot = []) :
+def FFM_var(Etats,V,U,I,Bord,params,solve_quad,variation,cas = False, iterations = False,plot = []) :
     (n,m) = U.shape
     Z = 2*np.ones((n,m))
     it = 0
@@ -165,11 +165,59 @@ def FFM(Etats,V,U,I,Bord,params,solve_quad,variation,cas = False, iterations = F
                 q_gradx, q_grady, epsx, epsy = voisins_gradient_per(U,pi,pj)
                 (r1,r2),cas = solve_quad(U[q_gradx[0],q_gradx[1]],U[q_grady[0],q_grady[1]],I[pi,pj],epsx,epsy,params)
                 CAS[pi,pj] = cas
-                if fc.variation_per(U,r1,i,j,pi,pj) < fc.variation_per(U,r2,i,j,pi,pj) :
+                if variation(U,r1,i,j,pi,pj) < variation(U,r2,i,j,pi,pj) :
                     u = r1
                 else :
                     u = r2
-                # u = max(r1,r2)
+                U[pi,pj] = u # actualisation de la valeur de p
+                V[pi,pj] = u
+    res = [U]
+    if cas :
+        res.append(CAS)
+    if iterations :
+        res.append(ITERATION)
+    return(res)
+
+
+def FFM(Etats,V,U,I,Bord,params,solve_quad,cas = False, iterations = False,plot = []) :
+    (n,m) = U.shape
+    Z = 2*np.ones((n,m))
+    it = 0
+    ITERATION = np.zeros((n,m))
+    CAS = np.zeros((n,m))
+    if len(plot)>0 :
+        plt.ion()
+        plt.show()
+        from matplotlib import cm
+    while not((Etats==Z).all()) :
+        k = np.argmin(V)
+        i = k//m
+        j = k - i*m # (i,j) sont les coordonnées du point Trial de valeur minimale
+        Etats[i,j] = 2
+        if 1 in plot :
+            plt.figure("plot Etats")
+            plt.clf()
+            plt.imshow(Etats,cmap=plt.cm.RdBu_r)
+            plt.colorbar()
+            plt.pause(0.01)
+        if 2 in plot :
+            plt.figure("plot U")
+            plt.clf()
+            plt.imshow(U,cmap=plt.cm.RdBu_r)
+            plt.colorbar()
+            plt.pause(0.01)
+        ITERATION[i,j] = it
+        it+=1
+        V[i,j] = np.inf
+        vois = voisins(i,j,n,m)
+        list_voisins = vois[0]+vois[1]
+        for p in list_voisins :
+            pi,pj = p
+            if Etats[pi,pj] != 2 and not(Bord[pi,pj]) :
+                Etats[pi,pj] = 1
+                q_gradx, q_grady, epsx, epsy = voisins_gradient_per(U,pi,pj)
+                u,cas = solve_quad(U[q_gradx[0],q_gradx[1]],U[q_grady[0],q_grady[1]],I[pi,pj],epsx,epsy,params)
+                CAS[pi,pj] = cas
                 U[pi,pj] = u # actualisation de la valeur de p
                 V[pi,pj] = u
     res = [U]
