@@ -23,7 +23,7 @@ def solve_quad(x, y, cp,epsx,epsy,params) :
         c = cp**2*(h**2+x**2+y**2)-(γ*h+α*x*epsx+β*y*epsy)**2
         cas = 3
     delta = b**2-4*a*c
-    return((np.max(np.roots([a,b,c])).real),cas)
+    return((np.max(np.roots([a,b,c])).real),cas,delta)
 
 
 
@@ -46,7 +46,7 @@ def solve_quad2(x, y, cp,epsx,epsy,params) :
         c = cp**2*(h**2+x**2+y**2)-(γ*h+α*x*epsx+β*y*epsy)**2
         cas = 3
     delta = b**2-4*a*c
-    return((np.roots([a,b,c]).real),cas)
+    return((np.roots([a,b,c]).real),delta)
 
 def variation_per(U,r,i,j,pi,pj) :
     (n,m) = U.shape
