@@ -41,10 +41,10 @@ import pylab as plt
 plt.ion()
 plt.show()
 
-n = 101
-m = 101
-i0,j0 = 50, 50 # centre du carré
-r = 40
+n = 201
+m = 201
+i0,j0 = 100, 100 # centre du carré
+r = 80
 
 def est_dans_cercle(i,j,r) :
     return((i-i0)**2+(j-j0)**2 < r**2)
@@ -63,6 +63,7 @@ U = np.zeros((n,m))
 V = np.inf*np.ones((n,m)) # Valeurs des trials
 
 
+
 for i in range(n) :
     for j in range(n) :
         if est_dans_cercle(i,j,r) :
@@ -70,18 +71,11 @@ for i in range(n) :
             U[i,j] = np.inf # valeur de la fonction
         elif est_au_bord(i,j,r) :
             Etats[i,j] = 1
-            # U[i,j] = np.inf
-            U[i,j] = 0 # Triche ??
+            U[i,j] = 0
             V[i,j] = 0
 
+
 # TODO : en démarrant sur un pixel random, on n'arrive pas à calculer tous les points, mais en initialisant le contour du bord à 1 ça marche
-# k = np.argmax(1*(Etats==1)) # on prend un pixel sur le bord
-# print(k)
-# i = k//m
-# j = k - i*m
-# début = (i,j)
-# V[début[0],début[1]] = 0 ## le fast marching démarre sur les voisins de ce point, IL FAUT QUE DES PIXELS A RESOUDRE SOIENT DANS SES VOISINS, le point de départ ne doit pas être quelconque a priori
-# U[début[0],début[1]] = 1
 
 
 np.save("cercle Etats initial",Etats)
@@ -130,7 +124,7 @@ def voisins_gradient(pi,pj) :
 
 ## Algo :
 
-plt.figure(1)
+plt.figure(2)
 
 while not((Etats==Z).all()) :
     k = np.argmin(V)
@@ -138,7 +132,7 @@ while not((Etats==Z).all()) :
     j = k - i*m # (i,j) sont les coordonnées du point Trial de valeur minimale
     Etats[i,j] = 2
     # plt.clf()
-    # plt.imshow(U)
+    # plt.imshow(Etats)
     # plt.pause(0.01)
     V[i,j] = np.inf
     vois = voisins(i,j)
@@ -157,5 +151,6 @@ while not((Etats==Z).all()) :
 plt.clf()
 plt.imshow(U)
 plt.colorbar()
+
 
 plt.show()
