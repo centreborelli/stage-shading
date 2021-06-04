@@ -1,0 +1,187 @@
+Bonjour Romain, Vianney,
+
+Je viens de lire vos nouveaux codes et les exécuter (enfin,
+une partie).  L'organisation actuelle est beaucoup plus
+claire, merci!  Il n'est pas clair pour moi si vous avez
+réussi à résoudre le problème de l'instabilité pour le cas
+du relief constant.  D'ailleurs, pouvez-vous rajouter
+quelques commentaires en début de chaque fichier qui
+expliquent à quoi il sert?  Notamment sur les fichiers qui
+lancent des expériences.
+
+À ce propos, il faudra bien maitriser ces cas simples, sans
+doute dans le cas numérique mais aussi sur la solution
+exacte.  Notamment, il me parait fondamental savoir calculer
+à la main la réponse au cas de base suivant:
+
+PROBLÈME A.  (Le problème le plus simple possible de shape from shading)
+
+Soit Ω le semi-plan supérieur.  On observe sur ce domaine un
+éclairage constant I(x,y)=c.  On sait que la direction du
+soleil est le vecteur unitaire (α,β,γ) et on a la condition
+de bord u(x,0)=0.  Démontrez que le relief initial est de la
+forme u(x,y)=py et exprimez le coefficient p comme fonction
+des quatre nombres (c,α,β,γ).
+
+OBSERVATION A.0. Supposez que l'albédo est 1 et la lumière ambiante 0.
+
+OBSERVATION A.1. Il se peut bien que pour certaines valeurs
+des paramètres il n'y ait pas de solution p(c,α,β,γ), ou
+qu'elle ne soit pas unique.  Tous ces cas ont une
+interprétation géométrique intéressante.
+
+OBSERVATION A.2. Si on a une condition de bord constante
+u(x,0)=q, alors la solution sera u(x,y)=px+q, avec le même p
+que pour q=0.  Ainsi, on peut résoudre itérativement le
+problème quand l'image I est constante par bandes
+horizontales.  La fonction résultante u sera ainsi continue
+et affine par morceaux.
+
+OBSERVATION A.3. Par rotation du problème entier, on pourra
+résoudre également le problème, de façon explicite, quand
+l'image I soit constante par morceaux (!).  Pour ce faire,
+il faudra d'abord résoudre une variante du problème A, avec
+condition de bord linéaire u(x,0)=q+rx, plus possibles
+conditions de compatibilité.  C'est compliqué à écrire sur
+papier, mais il me parait que la méthode complète de
+résolution pour le cas I constant par morceaux (qui inclut
+par exemple le cas où I est constante sur les petits carrés
+de chaque pixel...) est accessible à un programme simple, si
+vous êtes intéressés à parcourir le stage par ce chemin.  Je
+ne vous le conseille pas forcément, à mon avis le modèle
+"continu" sera plus intéressant pour vous.
+
+On peut résoudre le problème A de deux manières différentes.
+Soit on fait un raisonnement géométrique ad-hoc pour trouver
+la pente p du plan.  Soit on résout les équations
+caractéristiques pour ce cas simple (voir fichier en pièce
+jointe pour un rappel de ces équations).  Je vous conseille
+d'essayer les deux méthodes et vérifier qu'elles donnent le
+même résultat.
+
+Une fois vous avez construit la solution "par bandes" donnée
+par l'observation A.2., on peut étudier les solutions de
+viscosité de la forme suivante.  Au lieu du demi-plan
+supérieur tout entier, on considère une bande horizontale
+infinie définie par les inégalités 0<y<M.  Le bord de ce
+domaine est formé par les deux droites y=0 et y=M.  En
+utilisant le problème A pour propager la condition de bord à
+partir de chaque composante du bord, vous trouvez deux
+familles de solutions.  Comment construire la solution de
+viscosité (selon Rouy-Tourin) à partir de ces deux
+solutions?
+
+Ceci vous donnera des problèmes non-triviaux mais avec une
+solution explicite, pour laquelle vous pourrez comparer vos
+résultats numériques.
+
+
+En profitant l'occasion, je me permets de vous proposer
+quelques conseils d'organisation de vos codes (à titre
+indicatif, mais avec volonté de vous aider):
+
+B.0. Les noms de fichier avec espace sont à proscrire,
+surtout pour les fichiers Python:
+
+https://stackoverflow.com/questions/9123517/how-do-you-import-a-file-in-python-with-spaces-in-the-name
+
+Ainsi, au lieu de faire ce jeu que vous faites:
+
+        import os
+        os.chdir("modules python")
+        import fonctions_FMM as fm
+
+vous pouvez faire simplement
+
+        import modules.fonctions_FMM
+
+ceci est impossible si vos dossiers ou fichiers contiennent des espaces.
+
+D'ailleurs, je vous proposerai également une interdiction
+absolue d'utiliser "import os", car vous en avez pas
+vraiment besoin pour ce projet.
+
+
+B.1. Il faut séparer totalement, surtout sur le plan
+conceptuel, mais ainsi en utilisant de fichiers différents,
+les trois éléments suivants:
+
+Les ALGORITHMES.  Un ou plusieurs fichiers Python qui
+contiennent vos algorithmes, qui font tous les calculs
+(opérations avec des nombres et des numpy arrays).  Chaque
+algorithme, et ses variantes, sont dans des fonctions.  Les
+variables globales sont totalement interdites dans les
+fichiers des algorithmes.  Toute information doit être
+transmise à travers de paramètres à fonctions.  Très
+important: les algorithmes n'écrivent ni lisent des
+fichiers, et ne font surtout pas de plots.  Le seul "import"
+que vous pouvez faire dans les fichiers d'algorithmes est
+"import numpy", et peut être scipy, mais surtout, surtout
+pas pylab!  Je vous conseille d'avoir un seul fichier
+algos.py qui contient tous les algorithmes, mais vous pouvez
+aussi faire un dossier "algos" avec chaque algorithme dans
+un fichier différent.
+
+Les EXPÉRIENCES.  Un fichier pour chaque expérience, avec un
+commentaire de pourquoi vous la faites et quels sont les
+résultats attendus.  Vous utilisez des variables globales
+comme vous voulez, et vous appelez aux algorithmes qui font
+les calculs ("from algos import fm_version1, formes...").
+Très important: les expériences ne font AUCUN CALCUL
+directement, ni avec des nombres ni avec des tableaux numpy.
+Les seules deux fonctions de numpy que vous avez le droit
+d'utiliser sont numpy.load et numpy.save, pour lire et
+écrire des tableaux numpy au disc.  Encore plus important:
+dans les fichiers d'expériences, vous ne faites AUCUNE
+VISUALISATION (plots).  Vous exécutez l'expérience (qui peut
+prendre quelques minutes) et vous sauvegardez ses résultats
+dans des tableaux numpy.  Ainsi, "import pylab" est
+également interdit sur les fichiers d'expériences.
+
+Les VISUALISATIONS.  C'est ici que vous créez des images
+jpeg ou png, ou vidéos, avec vos visualisations.  Ainsi, les
+fichiers de visualisation utilisent numpy.load pour charger
+les résultats des expériences, et après ils font appel à
+pylab (mais pas obligatoirement) avec des palettes jolies,
+etc.  À noter que les visualisations ne sont pas forcément
+intéractives.  Vous ne faites pas plt.ion() plt.show(), mais
+plt.savefig("visu_experience_7.png").
+
+Cette façon d'organisation peut vous surprendre, et peut
+être vous n'y êtes pas d'accord.  Vous m'accorderez
+probablement (vu vos changements récents aux codes) que la
+séparation entre ALGORITHMES d'un côté et
+EXPÉRIENCES/VISUALISATIONS de l'autre est raisonnable.  La
+principale raison pour séparer aussi EXPÉRIENCES des
+VISUALISATIONS est que les expériences sont beaucoup plus
+lourdes.  Si vous ne les séparez pas, et vous voulez re-voir
+le résultat d'une expérience avec une palette légèrement
+différente, vous n'avez pas à tourner les expériences
+lourdes, seulement les visualisations qui s'executent
+rapidement.  Également, il n'est pas obligatoire d'utiliser
+pylab pour visualiser des tableaux numpy, vous pouvez suivre
+le conseil de Marie et essayer vpv:
+
+https://github.com/kidanger/vpv
+
+Et un dernier conseil d'organisation.  Faites un fichier
+"run_all.py" qui exécute toutes vos expériences l'une
+derrière l'autre, toutes vos visualisations, et crée toutes
+les figures que vous voulez mettre dans le rapport (et
+d'autres aussi).  Ce n'est pas grave si ce script prend
+plusieurs heures à s'exécuter, mais il est important de ne
+pas laisser que des vielles, même celles avec résultats
+"négatifs", expériences deviennent irreproductibles parce
+que le code qui les exécutait a changé ou disparu.
+Re-lancez ce script au moins une fois par semaine, et
+vérifiez qu'il fait ce qu'il faut.  Ne gardez pas des
+vielles images que vous ne pouvez plus reproduire.  En fait,
+si vous mettez ce fichier "run_all.py" dans le git on pourra
+tous l'exécuter séparément et vérifier les résultats.
+
+
+
+
+
+
+# vim:set tw=77 filetype=text spell spelllang=fr:
