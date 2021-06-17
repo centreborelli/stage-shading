@@ -1,6 +1,6 @@
 import numpy as np
 import os
-path = 'D:/L3/Stage/modules python'
+path = 'C:/Users/dugas/Documents/stage-shading/src/modules python'
 os.chdir(path)
 import fonctions_FMM as fm
 
