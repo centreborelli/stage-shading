@@ -1,6 +1,6 @@
 import numpy as np
 import os
-path = 'D:/L3/Stage/modules python'
+path = 'C://Users/dugas/Documents/stage-shading/src/modules python'
 os.chdir(path)
 import fonctions_calculs as fc
 import pylab as plt
@@ -90,7 +90,7 @@ def voisins_gradient(U,pi,pj) :
 
 
 def voisins_gradient_per(U,pi,pj) :
-    '''Renvoie les coordonnées des voisins à choisir pour le calcul du nouveau point, en indiquant s'ils ont été pris à gauche ou à droite (en haut ou en bas) avec epx et epsy'''
+    '''Renvoie les coordonnées des voisins à choisir pour le calcul du nouveau point, en indiquant s'ils ont été pris à gauche ou à droite (en haut ou en bas) avec epx et epsy +++ ADAPTE POUR LA DISCONTINUITE'''
     (n,m) = U.shape
     res = voisins_per(pi,pj,n,m)
 
@@ -103,12 +103,13 @@ def voisins_gradient_per(U,pi,pj) :
         epsx = 1
 
     vois_haut, vois_bas = res[1][0],res[1][1]
-    if U[vois_haut[0],vois_haut[1]] < U[vois_bas[0],vois_bas[1]] :
+    if U[vois_haut[0],vois_haut[1]] < U[vois_bas[0],vois_bas[1]]  :
         q_grady = vois_haut
         epsy = -1
     else :
         q_grady = vois_bas
         epsy = 1
+
     return(q_gradx, q_grady, epsx, epsy)
 
 
@@ -126,7 +127,8 @@ def Initialise_contour(height,seuil) :
     V[B] = 0
     return(U,V,Etats)
 
-def FFM_var(Etats,V,U,I,Bord,params,solve_quad,variation,Cas = False, iterations = False, Delta = False,plot = []) :
+def FMM_var(Etats,V,U,I,Bord,params,solve_quad,variation,Cas = False, iterations = False, Delta = False,plot = []) :
+    """minimisation des dérivées seconde"""
     (n,m) = U.shape
     Z = 2*np.ones((n,m))
     it = 0
@@ -184,7 +186,8 @@ def FFM_var(Etats,V,U,I,Bord,params,solve_quad,variation,Cas = False, iterations
     return(res)
 
 
-def FFM(Etats,V,U,I,Bord,params,solve_quad,Cas = False, iterations = False, Delta = False,plot = []) :
+def FMM(Etats,V,U,I,Bord,params,solve_quad,Cas = False, iterations = False, Delta = False,plot = []) :
+    """calcul avec un seul voisin """
     (n,m) = U.shape
     Z = 2*np.ones((n,m))
     it = 0
@@ -215,7 +218,7 @@ def FFM(Etats,V,U,I,Bord,params,solve_quad,Cas = False, iterations = False, Delt
         ITERATION[i,j] = it
         it+=1
         V[i,j] = np.inf
-        vois = voisins(i,j,n,m)
+        vois = voisins_per(i,j,n,m)
         list_voisins = vois[0]+vois[1]
         for p in list_voisins :
             pi,pj = p
@@ -237,7 +240,8 @@ def FFM(Etats,V,U,I,Bord,params,solve_quad,Cas = False, iterations = False, Delt
         res.append(DELTA)
     return(res)
 
-def FFM_strict(Etats,V,U,I,Bord,params,solve_quad,Cas = False, iterations = False, Delta = False, plot = []) :
+def FMM_strict(Etats,V,U,I,Bord,params,solve_quad,Cas = False, iterations = False, Delta = False, plot = []) :
+    """pas de calcul si pas deux voisins"""
     (n,m) = U.shape
     Z = 2*np.ones((n,m))
     it = 0
@@ -284,6 +288,78 @@ def FFM_strict(Etats,V,U,I,Bord,params,solve_quad,Cas = False, iterations = Fals
                     CAS[pi,pj] = cas
                     U[pi,pj] = u # actualisation de la valeur de p
                     V[pi,pj] = u
+    res = [U]
+    if Cas :
+        res.append(CAS)
+    if iterations :
+        res.append(ITERATION)
+    if Delta :
+        res.append(DELTA)
+    return(res)
+
+def FMM_discontinue(Etats,V,U,I,Bord,params,solve_quad,masque,Cas = False, iterations = False, Delta = False,plot = []) :
+    """calcul avec une discontinuité (=ombre) """
+    (n,m) = U.shape
+    Z = 2*np.ones((n,m))
+    it = 0
+    ITERATION = np.zeros((n,m))
+    CAS = np.zeros((n,m))
+    DELTA = np.zeros((n,m))
+    if len(plot)>0 :
+        # plt.ion()
+        plt.show()
+        from matplotlib import cm
+    while not((Etats==Z).all()) :
+        k = np.argmin(V)
+        i = k//m
+        j = k - i*m # (i,j) sont les coordonnées du point Trial de valeur minimale
+        Etats[i,j] = 2
+        if 1 in plot :
+            plt.figure("plot Etats")
+            plt.clf()
+            plt.imshow(Etats,cmap=plt.cm.RdBu_r)
+            plt.colorbar()
+            plt.pause(0.01)
+        if 2 in plot :
+            plt.figure("plot U")
+            plt.clf()
+            plt.imshow(U,cmap=plt.cm.RdBu_r)
+            plt.colorbar()
+            plt.pause(0.01)
+        ITERATION[i,j] = it
+        it += 1
+        V[i,j] = np.inf
+        vois = voisins_per(i,j,n,m)
+        list_voisins = vois[0]+vois[1]
+        for p in list_voisins :
+            pi,pj = p
+            if Etats[pi,pj] != 2 and not(Bord[pi,pj]) :
+                Etats[pi,pj] = 1
+                q_gradx, q_grady, epsx, epsy = voisins_gradient_per(U,pi,pj)
+                if (masque[pi,pj] == 1 and pi == i+1) or (masque[pi,pj] == 2 and pj == j-1) or (masque[pi,pj] == 3 and pi == i-1) or (masque[pi,pj] == 4 and pi == j+1) :
+                    None
+                else :
+
+                    if (masque[pi,pj] == 1 and q_grady[0] == pi-1) :
+                        q_grady = pi+1,q_grady[1]
+
+                    elif (masque[pi,pj] == 2 and q_gradx[1] == pj+1) :
+                        q_gradx = q_gradx[0],pj-1
+
+                    elif  (masque[pi,pj] == 3 and q_grady[0] == pi+1) :
+                        q_grady = pi-1,q_grady[1]
+
+                    elif (masque[pi,pj] == 4 and q_gradx[1] == pj-1) :
+                        q_gradx = q_gradx[0],pj+1
+
+
+                    u,cas,delta = solve_quad(U[q_gradx[0],q_gradx[1]],U[q_grady[0],q_grady[1]],I[pi,pj],epsx,epsy,params)
+                    if delta<0 :
+                        DELTA[pi,pj] = 1
+                    CAS[pi,pj] = cas
+                    U[pi,pj] = u # actualisation de la valeur de p
+                    V[pi,pj] = u
+
     res = [U]
     if Cas :
         res.append(CAS)
