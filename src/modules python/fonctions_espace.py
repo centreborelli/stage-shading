@@ -24,7 +24,7 @@ def GenerateRHS(height,params):
     return Intensity,Omega
 
 def gaussienne_x(x,y) :
-    return(np.exp(-7*(x-0.5)**2))
+    return(np.exp(-10*(x-0.5)**2))
 
 def gaussienne(x,y) :
     return(np.exp(-5*((x-0.5)**2+(y-0.5)**2)))
@@ -44,22 +44,38 @@ def GenerateIntDiscont(height,params) :
     Omega = height>0
     return Intensity,Omega
 
-def Intensite_discontinue(height,masque,params):
+
+def GenerateRHS_discontinue(height,masque,params):
     α,β,γ,h = params
     hx,hy = np.gradient(height,h)
     (n,m) = height.shape
     for i in range(n) :
         for j in range(m) :
-            if masque[i,j] == 1 :
-                hy[i,j] = (height[i+1,j]-height[i,j])/h
-            elif masque[i,j] == 2 :
-                hx[i,j] = (height[i,j]-height[i,j-1])/h
-            elif masque[i,j] == 3 :
-                hy[i,j] = (height[i,j]-height[i-1,j])/h
-            elif masque[i,j] == 4 :
-                hx[i,j] = (height[i,j+1]-height[i,j])/h
+            try :
+                if masque[i,j] % 2 == 0 :
+                    hx[i,j] = (height[i+1,j]-height[i,j])/h
+                elif masque[i,j] % 3 == 0 :
+                    if j == 0 :
+                        hy[i,j] = 0
+                    else :
+                        hy[i,j] = (height[i,j]-height[i,j-1])/h
+                elif masque[i,j] % 5 == 0 :
+                    if i == 0 :
+                        hx[i,j] == 0
+                    else :
+                        hx[i,j] = (height[i,j]-height[i-1,j])/h
+                elif masque[i,j] % 7 == 0 :
+                    hy[i,j] = (height[i,j+1]-height[i,j])/h
+            except IndexError :
+                if j == n-1 :
+                    hy[i,j] = 0
+                if i == m-1 :
+                    hx[i,j] == 0
+
     Intensity = (α*hx+β*hy+γ)/np.sqrt(1+hx**2+hy**2)
     return Intensity
+
+
 
 def GenerateIntIter(U,I,params) :
     (n,m) = U.shape
@@ -67,7 +83,7 @@ def GenerateIntIter(U,I,params) :
     p0 = np.array([-α,-β,γ])
     Intensity = np.zeros((n,m))
     hy,hx = np.gradient(U,h)
-    max = 0
+
     for i in range(n) :
         for j in range(m) :
             p = p0*I[i,j]
@@ -76,18 +92,30 @@ def GenerateIntIter(U,I,params) :
             k = x-p-np.dot(x-p,p)*p
             x = p + np.sqrt(1-np.dot(p,p))*((k)/np.sqrt(np.dot(k,k)))
             Intensity[i,j] = x[2]
-            if np.dot(x-w,x-w) > max :
-                max = np.dot(x-w,x-w)
-            if max > 31 :
-                pass
-    print(max)
+
     return(Intensity)
 
 def IntInit(I,params) :
     n,m = I.shape
     I0 = np.zeros((n,m))
+    alpha,beta,gamma,h = params
+    p0 = np.array([-alpha,-beta,gamma])
+    u = np.array([1,0,alpha/gamma])/np.sqrt(np.dot(np.array([1,0,alpha/gamma]),np.array([1,0,alpha/gamma])))
+    v = np.array([-(beta*alpha)/(gamma**2+alpha**2),1,(beta/gamma) - (beta*alpha**2)/(gamma**3+alpha**2*gamma)])/np.sqrt(np.dot(np.array([-(beta*alpha)/(gamma**2+alpha**2),1,(beta/gamma) - (beta*alpha**2)/(gamma**3+alpha**2*gamma)]),np.array([-(beta*alpha)/(gamma**2+alpha**2),1,(beta/gamma) - (beta*alpha**2)/(gamma**3+alpha**2*gamma)])))
     for i in range(n) :
         for j in range(m) :
+            a = 2*np.pi*np.random.rand()
+            R = np.sqrt(1-I[i,j]**2)
+            x = I[i,j]*p0 + R*(np.cos(a)*u + np.sin(a)*v)
+            I0[i,j] = x[2]
+    return(I0)
+
+I = np.zeros((1,1))
+params = 1,1,1,1
+
+a = IntInit(I,params)
+
+
 
 
 
