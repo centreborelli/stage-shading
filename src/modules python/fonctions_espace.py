@@ -51,13 +51,13 @@ def Intensite_discontinue(height,masque,params):
     for i in range(n) :
         for j in range(m) :
             if masque[i,j] == 1 :
-                hx[i,j] = (height[i+1,j]-height[i,j])/h
+                hy[i,j] = (height[i+1,j]-height[i,j])/h
             elif masque[i,j] == 2 :
-                hy[i,j] = (height[i,j]-height[i,j-1])/h
+                hx[i,j] = (height[i,j]-height[i,j-1])/h
             elif masque[i,j] == 3 :
-                hx[i,j] = (height[i,j]-height[i-1,j])/h
+                hy[i,j] = (height[i,j]-height[i-1,j])/h
             elif masque[i,j] == 4 :
-                hy[i,j] = (height[i,j+1]-height[i,j])/h
+                hx[i,j] = (height[i,j+1]-height[i,j])/h
     Intensity = (α*hx+β*hy+γ)/np.sqrt(1+hx**2+hy**2)
     return Intensity
 
