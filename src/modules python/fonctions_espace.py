@@ -44,6 +44,23 @@ def GenerateIntDiscont(height,params) :
     Omega = height>0
     return Intensity,Omega
 
+def Intensite_discontinue(height,masque,params):
+    α,β,γ,h = params
+    hx,hy = np.gradient(height,h)
+    (n,m) = height.shape
+    for i in range(n) :
+        for j in range(m) :
+            if masque[i,j] == 1 :
+                hx[i,j] = (height[i+1,j]-height[i,j])/h
+            elif masque[i,j] == 2 :
+                hy[i,j] = (height[i,j]-height[i,j-1])/h
+            elif masque[i,j] == 3 :
+                hx[i,j] = (height[i,j]-height[i-1,j])/h
+            elif masque[i,j] == 4 :
+                hy[i,j] = (height[i,j+1]-height[i,j])/h
+    Intensity = (α*hx+β*hy+γ)/np.sqrt(1+hx**2+hy**2)
+    return Intensity
+
 def GenerateIntIter(U,I,params) :
     (n,m) = U.shape
     α,β,γ,h = params
